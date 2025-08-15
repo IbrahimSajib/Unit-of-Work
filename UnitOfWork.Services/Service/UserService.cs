@@ -22,6 +22,18 @@ namespace UnitOfWork.Services.Service
             await _unitOfWork.SaveChangesAsync();
             return user;
         }
+        
+        public async Task<bool> UpdateAsync(User user)
+        {
+            var existing = await _unitOfWork.Users.GetByIdAsync(user.Id);
+            if (existing == null) return false;
+            existing.Name = user.Name;
+            existing.Email = user.Email;
+
+            _unitOfWork.Users.Update(existing);
+            var result = await _unitOfWork.SaveChangesAsync() > 0;
+            return result;
+        }
 
         public async Task<bool> DeleteAsync(int id)
         {
@@ -29,8 +41,8 @@ namespace UnitOfWork.Services.Service
             if (user == null) return false;
 
             _unitOfWork.Users.Delete(user);
-            await _unitOfWork.SaveChangesAsync();
-            return true;
+            var result = await _unitOfWork.SaveChangesAsync() > 0;
+            return result;
         }
 
     }
